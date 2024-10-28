@@ -9,7 +9,6 @@ require('dotenv').config();
 
 const app = express();
 const port = 3000;
-console.log('Hugging Face API Key:', process.env.HUGGINGFACE_API_KEY);
 
 // Initialize HuggingFace with correct constructor
 const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);

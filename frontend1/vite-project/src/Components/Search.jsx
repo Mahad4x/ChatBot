@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 
 const Search = ({ placeholder = "Ask a question about your document" }) => {
   const [inputValue, setInputValue] = useState('');
+  const [question, setQuestion] = useState('');
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState('');
+  const [uploadMessage, setUploadMessage] = useState(''); // New state for upload message
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -18,6 +20,7 @@ const Search = ({ placeholder = "Ask a question about your document" }) => {
     setFile(selectedFile);
     setIsLoading(true);
     setError('');
+    setUploadMessage(''); // Clear upload message on new upload
 
     const formData = new FormData();
     formData.append('document', selectedFile);
@@ -33,7 +36,8 @@ const Search = ({ placeholder = "Ask a question about your document" }) => {
       }
       
       const data = await response.json();
-      setError('Document uploaded successfully!');
+      setUploadMessage('Upload successful!'); // Set success message
+      setError('');
     } catch (error) {
       setError('Error uploading document: ' + error.message);
     } finally {
@@ -63,6 +67,7 @@ const Search = ({ placeholder = "Ask a question about your document" }) => {
 
       const data = await response.json();
       setAnswer(data.answer);
+      setQuestion(inputValue);
       setInputValue('');
     } catch (error) {
       setError('Error getting answer: ' + error.message);
@@ -77,13 +82,35 @@ const Search = ({ placeholder = "Ask a question about your document" }) => {
       <div className="flex items-center justify-center w-full">
         <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-            </svg>
-            <p className="mb-2 text-sm text-gray-500">
-              <span className="font-semibold">Click to upload</span> or drag and drop
-            </p>
-            <p className="text-xs text-gray-500">PDF, DOC, or TXT</p>
+            {uploadMessage ? ( // Show success message with tick icon
+              <div className="flex items-center space-x-2 text-green-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span>{uploadMessage}</span>
+              </div>
+            ) : (
+              <>
+                <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                </svg>
+                <p className="mb-2 text-sm text-gray-500">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">PDF, DOC, or TXT</p>
+              </>
+            )}
           </div>
           <input 
             type="file" 
@@ -142,6 +169,8 @@ const Search = ({ placeholder = "Ask a question about your document" }) => {
       {/* Answer Display */}
       {answer && (
         <div className="p-4 bg-white rounded-lg shadow-md">
+          <h3 className="font-semibold mb-2">Question:</h3>
+          <p className="text-gray-700">{question}</p>
           <h3 className="font-semibold mb-2">Answer:</h3>
           <p className="text-gray-700">{answer}</p>
         </div>
